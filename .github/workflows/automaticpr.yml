@@ -1,28 +1,35 @@
-name: Automatic Pull Request Workflow
+name: Automatic Pull Request to Develop
 
 on:
   push:
     branches-ignore:
-      - 'develop'  # Ignora a branch develop para evitar criar PRs a partir dela
+      - develop  # Ignora a branch develop para não acionar o workflow nela
 
 jobs:
-  create_autopr:
+  create_pr:
     runs-on: ubuntu-latest
-    name: Create Automatic Pull Request
+    name: Create Pull Request to Develop
 
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
 
-      - name: Automatic Pull Request
-        uses: irgolic/AutoPR@v0.2.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # Token GitHub
-          base_branch: develop  # Defina a branch base
-          loading_gif_url: https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif  # GIF personalizado
-          target_branch_name_template: autopr/{issue_number}  # Padrão de nome para a branch de destino
-          overwrite_existing: true  # Permitir sobrescrever branches e PRs existentes
-
-      - name: Display Pull Request URL
+      - name: Set up Git
         run: |
-          echo "Pull Request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Create Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Automated PR from ${{ github.head_ref }} to develop"
+          body: |
+            This pull request was automatically created by GitHub Actions to merge changes from branch ${{ github.head_ref }} into develop.
+          base: develop  # A branch para a qual o PR será criado
+          branch: auto-pr-${{ github.head_ref }}  # Nome da branch de origem do PR
+
+      - name: Display created pull request URL
+        run: |
+          echo "Created pull request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
