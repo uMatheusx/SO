@@ -12,5 +12,8 @@ public class AtvdSoApplication {
 		SpringApplication.run(AtvdSoApplication.class, args);
         
         Escalonador.run();
+        int i = 1;
+        int l = 2;
+        System.out.println(i+l);
     }
 }

@@ -32,6 +32,7 @@ jobs:
 
   create_pr:
     runs-on: ubuntu-latest
+    needs: maven_build  # Executa somente após o job de build ser concluído com sucesso
 
     steps:
       - name: Check out the repository
@@ -45,7 +46,9 @@ jobs:
       - name: Create a branch for PR
         id: create_branch
         run: |
-          BRANCH_NAME="auto-pr-${GITHUB_SHA}"
+          # Use a timestamp or unique identifier to ensure the branch name is unique
+          TIMESTAMP=$(date +%s)
+          BRANCH_NAME="auto-pr-${TIMESTAMP}"
           git checkout -b $BRANCH_NAME
           git push origin $BRANCH_NAME
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
