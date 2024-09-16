@@ -1,14 +1,13 @@
-name: Automatic Pull Request to Develop
+name: Automatic Pull Request
 
 on:
   push:
-    branches-ignore:
-      - develop  # Ignora a branch develop para não acionar o workflow nela
+    branches:
+      - '**'  # Aciona o workflow para qualquer branch
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
-    name: Create Pull Request to Develop
 
     steps:
       - name: Check out the repository
@@ -16,19 +15,28 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Create a branch for PR
+        id: create_branch
+        run: |
+          BRANCH_NAME="auto-pr-${GITHUB_SHA}"
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
       - name: Create Pull Request
-        id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Automated PR from ${{ github.head_ref }} to develop"
+          title: "Automated PR from ${{ github.head_ref }} to develop."
           body: |
-            This pull request was automatically created by GitHub Actions to merge changes from branch ${{ github.head_ref }} into develop.
-          base: develop  # A branch para a qual o PR será criado
-          branch: auto-pr-${{ github.head_ref }}  # Nome da branch de origem do PR
+            This PR was created automatically via GitHub Actions after passing all build steps.
+          base: develop  # Branch base onde o PR será criado
+          branch: ${{ env.BRANCH_NAME }}  # Branch de destino
+          delete-branch: false
+          draft: false
 
       - name: Display created pull request URL
         run: |
