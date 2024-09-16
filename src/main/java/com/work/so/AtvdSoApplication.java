@@ -13,6 +13,7 @@ public class AtvdSoApplication {
         
         Escalonador.run();
         
+        System.out.println("Teste workflows");
 
     }
 }
