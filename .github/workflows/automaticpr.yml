@@ -1,0 +1,28 @@
+name: Automatic Pull Request Workflow
+
+on:
+  push:
+    branches-ignore:
+      - 'develop'  # Ignora a branch develop para evitar criar PRs a partir dela
+
+jobs:
+  create_autopr:
+    runs-on: ubuntu-latest
+    name: Create Automatic Pull Request
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
+      - name: Automatic Pull Request
+        uses: irgolic/AutoPR@v0.2.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Token GitHub
+          base_branch: develop  # Defina a branch base
+          loading_gif_url: https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif  # GIF personalizado
+          target_branch_name_template: autopr/{issue_number}  # Padrão de nome para a branch de destino
+          overwrite_existing: true  # Permitir sobrescrever branches e PRs existentes
+
+      - name: Display Pull Request URL
+        run: |
+          echo "Pull Request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
