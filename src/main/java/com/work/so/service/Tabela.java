@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+
+@Getter
+
 public class Tabela {
     
     private final Map<String, List<String>> tabela = new HashMap<>();
@@ -43,4 +47,5 @@ public class Tabela {
             System.out.println();
         }
     }
+    
 }
