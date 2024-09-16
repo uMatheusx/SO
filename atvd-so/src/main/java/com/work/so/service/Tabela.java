@@ -1,13 +1,13 @@
-package com.work.so.model;
+package com.work.so.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TabelaModel {
+public class Tabela {
     
-    private Map<String, List<String>> tabela = new HashMap<>();
+    private final Map<String, List<String>> tabela = new HashMap<>();
     
     public void gerarColunas(String... colunas) {
         for (String coluna : colunas) {
