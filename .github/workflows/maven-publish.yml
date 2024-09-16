@@ -1,4 +1,4 @@
-name: Create Pull Request to Develop (Maven Project)
+name: Maven Build and PR Creation (Maven Project)
 
 on:
   push:
@@ -6,8 +6,9 @@ on:
       - 'develop'  # Ignora a branch principal para evitar criar PRs a partir dela
 
 jobs:
-  build_and_create_pr:
+  maven_build:
     runs-on: ubuntu-latest
+    name: Build with Maven
 
     steps:
       - name: Check out the repository
@@ -29,17 +30,29 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
+  create_pr:
+    runs-on: ubuntu-latest
+    name: Create Pull Request
+    needs: maven_build  # Somente executa após o job de build ser concluído com sucesso
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+
       - name: Create Pull Request
         id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Automated PR - Changes from ${{ github.head_ref }}"
-          title: "Automated PR from ${{ github.head_ref }} to develop"
+          commit-message: "Automated PR - Changes from ${{ github.head_ref }}."
+          title: "Automated PR from ${{ github.head_ref }} to develop."
           body: |
             This PR was created automatically via GitHub Actions after passing all Maven build steps.
           base: develop  # Branch principal
-          head: ${{ github.head_ref }}  # Branch que recebeu o push (somente o nome da branch)
+          branch: create-pull-request/patch  # Define um nome fixo para a branch de PR
+          delete-branch: false  # Não exclui a branch criada após o PR
+          always-create: true  # Força a criação do PR mesmo sem mudanças
 
       - name: Display created pull request URL
-        run: echo "Created pull request URL:${{steps.create_pr.outputs.pull-request-url}}"
+        run: |
+          echo "Created pull request URL: ${{ steps.create_pr.outputs.pull-request-url }}"
