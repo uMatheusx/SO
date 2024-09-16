@@ -19,7 +19,7 @@ public class BCP {
     private ArrayList<String> codigo;
 
     public BCP(ArrayList<String> arquivo, int prioridade) {
-        this.pc = 1;
+        this.pc = 0;
         this.estado = SO.pronto; 
         this.prioridade = prioridade;
         this.creditos = prioridade;
@@ -28,6 +28,35 @@ public class BCP {
         this.nome = arquivo.get(0);
         arquivo.remove(0); 
         this.codigo = arquivo;
+    }
+
+    public int executaInstrucao(){
+        String instrucao = codigo.get(pc);
+        pc++;
+
+        if(instrucao.equals("E/S")){
+            estado = SO.bloqueado;
+            return estado;
+        }
+
+        if (instrucao.charAt(0) == 'X') {
+            int valor = instrucao.charAt(2) - '0'; 
+            registradorX = valor;
+            return estado;
+        }
+
+        if(instrucao.charAt(0) == 'Y'){
+            int valor = instrucao.charAt(2) - '0'; 
+            registradorY = valor;
+            return estado;
+        }
+
+        if(instrucao.equals("SAIDA")){
+            estado = SO.finalizado;
+            return estado;
+        }
+
+        return estado;
     }
 
     public void imprimirAtributos() {
@@ -41,8 +70,6 @@ public class BCP {
         System.out.println("Código: " + codigo);
         System.out.println();
     }
-
-
 }
 
 
