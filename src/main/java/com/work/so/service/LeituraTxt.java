@@ -7,21 +7,27 @@ import java.util.ArrayList;
 
 public class LeituraTxt {
     
-    public ArrayList<String> lePrograma(String caminhoArquivo) {
-        
+    public ArrayList<String> lePrograma(String caminhoArquivo) throws Exception {
         ArrayList<String> programa = new ArrayList<>();
         String filePath = caminhoArquivo; // Caminho do arquivo
-
+    
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
+            int contadorLinhas = 0;
+    
             while ((line = br.readLine()) != null) {
                 programa.add(line); // Adiciona a linha à ArrayList
+                contadorLinhas++;
+    
+                if (contadorLinhas >= 23) {
+                    throw new Exception("O arquivo contém 23 ou mais linhas.");
+                }
             }
-                
+    
         } catch (IOException e) {
             System.err.println("Erro ao ler o arquivo: " + e.getMessage());
         }
-
+    
         return programa;
     }
 
