@@ -1,4 +1,4 @@
-package com.work.so.model;
+package com.work.so.service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
