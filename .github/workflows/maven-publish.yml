@@ -32,26 +32,35 @@ jobs:
 
   create_pr:
     runs-on: ubuntu-latest
-    name: Create Pull Request
-    needs: maven_build  # Somente executa após o job de build ser concluído com sucesso
 
     steps:
       - name: Check out the repository
         uses: actions/checkout@v3
 
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Create a branch for PR
+        id: create_branch
+        run: |
+          BRANCH_NAME="auto-pr-${GITHUB_SHA}"
+          git checkout -b $BRANCH_NAME
+          git push origin $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
       - name: Create Pull Request
-        id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Automated PR - Changes from ${{ github.head_ref }}."
           title: "Automated PR from ${{ github.head_ref }} to develop."
           body: |
-            This PR was created automatically via GitHub Actions after passing all Maven build steps.
-          base: develop  # Branch principal
-          branch: create-pull-request/patch  # Define um nome fixo para a branch de PR
-          delete-branch: false  # Não exclui a branch criada após o PR
-          always-create: true  # Força a criação do PR mesmo sem mudanças
+            This PR was created automatically via GitHub Actions after passing all build steps.
+          base: develop  # Branch base onde o PR será criado
+          branch: ${{ env.BRANCH_NAME }}  # Branch de destino
+          delete-branch: false
+          draft: false
 
       - name: Display created pull request URL
         run: |
