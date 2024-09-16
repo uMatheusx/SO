@@ -4,8 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class SO {
-    private static final int pronto = 0;
-    private static final int executando = 1;
-    private static final int bloqueado = 2;
-    private String teste = "T";
+    public static final int pronto = 0;
+    public static final int executando = 1;
+    public static final int bloqueado = 2;
 }
