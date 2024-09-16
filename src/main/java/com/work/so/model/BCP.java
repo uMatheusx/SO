@@ -30,7 +30,8 @@ public class BCP {
         this.codigo = arquivo;
     }
 
-    public int executaInstrucao(){
+    public Integer executaInstrucao(){
+        // LoggerModel Logtest = new LoggerModel();       falta colocar logs em cada instrução
         String instrucao = codigo.get(pc);
         pc++;
 

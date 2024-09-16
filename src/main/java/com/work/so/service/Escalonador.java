@@ -31,11 +31,14 @@ public class Escalonador {
 			String index = String.format("src/main/java/com/work/so/codigos/%02d.txt", i);
 			arquivo = leitor.lePrograma(index);
 			BCP processo = new BCP(arquivo, prioridades.get(i-1));
-        	processo.imprimirAtributos();
+        	// processo.imprimirAtributos();
 			processosProntos.add(processo);
             tabelaProcesos.add(processo);
 		}
 
 		processosProntos.sort((p1,p2) -> { return -1 * p1.getPrioridade().compareTo(p2.getPrioridade()); });
+
+        processosProntos.get(0).executaInstrucao();
+
     }
 }
