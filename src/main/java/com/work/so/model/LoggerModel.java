@@ -60,7 +60,7 @@ import com.work.so.service.Tabela;
             }
 
             // Sobrecarga para tipo de log "INTE" com 1 parâmetro adicional
-            public void GerarLog(String tipoLog, String nomeArq, String instrucoes) {
+            public void GerarLog(String tipoLog, String nomeArq, Integer instrucoes) {
                 if ("INTE".equals(tipoLog)) {
                     String mensagem = "Interrompendo " + nomeArq + " após " + instrucoes + " instrucoes";
                     Log.add(mensagem);

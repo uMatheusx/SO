@@ -18,6 +18,8 @@ public class BCP {
     private Integer registradorY;
     private ArrayList<String> codigo;
     private Integer tempoBloqueado;
+    private boolean executando;
+    private Integer instrucoes;
 
     public BCP(ArrayList<String> arquivo, int prioridade) {
         this.pc = 0;
@@ -30,6 +32,8 @@ public class BCP {
         arquivo.remove(0); 
         this.codigo = arquivo;
         this.tempoBloqueado = 0;
+        this.executando = false;
+        this.instrucoes = 0;
     }
 
     public Integer diminuirTempoBloqueado() {
@@ -42,31 +46,50 @@ public class BCP {
     }
 
     public Integer executaInstrucao(LoggerModel Log){   
+
+        if(!executando) {
+            executando = true;
+            Log.GerarLog("EXEC", nome);
+            instrucoes = 0;
+        } 
+
         String instrucao = codigo.get(pc);
         pc++;
 
+        if(instrucao.equals("SAIDA")){
+            estado = SO.finalizado;
+            executando = false;
+            Log.GerarLog("END", nome, registradorX, registradorY);
+            instrucoes = 0; 
+            return estado;
+        }
+
+
+        instrucoes++;
+
         if(instrucao.equals("E/S")){
             estado = SO.bloqueado;
+            executando = false;
             Log.GerarLog("E/S", nome);
+            Log.GerarLog("INTE", nome, instrucoes);
             return estado;
         }
 
         if (instrucao.charAt(0) == 'X') {
             int valor = instrucao.charAt(2) - '0'; 
             registradorX = valor;
-            Log.GerarLog("EXEC", nome);
             return estado;
         }
 
         if(instrucao.charAt(0) == 'Y'){
             int valor = instrucao.charAt(2) - '0'; 
             registradorY = valor;
-            Log.GerarLog("EXEC", nome);
             return estado;
         }
 
         if(instrucao.equals("SAIDA")){
             estado = SO.finalizado;
+            executando = false;
             Log.GerarLog("END", nome, registradorX, registradorY);
             return estado;
         }
