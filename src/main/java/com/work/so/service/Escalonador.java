@@ -1,6 +1,7 @@
 package com.work.so.service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import com.work.so.helper.AdicionarOrdenado;
@@ -61,9 +62,11 @@ public class Escalonador {
                     //tratamento pra quando todos da lista de processos prontos terem 0 créditos
                 }
                 
-                for (BCP processo : processosBloqueados) {
+                for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
+                    BCP processo = iterator.next();
                     if (processo.diminuirTempoBloqueado() == -1) {
-                        processosBloqueados.remove(processo);
+                        iterator.remove();  // Usa o iterador para remover o processo de forma segura
+                        processosProntos.add(processo);
                     }
                 }
 
