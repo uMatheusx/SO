@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import com.work.so.helper.ContaArquivos;
 import com.work.so.model.BCP;
+import com.work.so.model.LoggerModel;
 
 public class Escalonador {
     public static void run() throws Exception {
@@ -15,6 +16,8 @@ public class Escalonador {
         LinkedList<BCP> processosBloqueados = new LinkedList<>();
 
         LinkedList<BCP> tabelaProcesos = new LinkedList<>();
+
+        LoggerModel Log = new LoggerModel();  
 		
         int quantum = leitor.leQuantum("src/main/java/com/work/so/codigos/quantum.txt");
         System.out.println("Quantum:" + quantum); //só pra teste
@@ -38,7 +41,15 @@ public class Escalonador {
 
 		processosProntos.sort((p1,p2) -> { return -1 * p1.getPrioridade().compareTo(p2.getPrioridade()); });
 
-        processosProntos.get(0).executaInstrucao();
+        
+        for (BCP processo : processosProntos) {
+            processo.carregarProcessos(Log); // Chama o método carregarProcessos de cada processo
+        }
+        
+    
+        Log.RelatorioLog();
+
+
 
     }
 }
