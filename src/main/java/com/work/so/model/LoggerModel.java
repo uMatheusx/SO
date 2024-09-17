@@ -30,21 +30,43 @@ import com.work.so.service.Tabela;
                 this.Log = new ArrayList<>();
             }
 
-
+                    // Método para logs normais
             public void GerarLog(String tipoLog, String nomeArq) {
-                // Acessa o mapa de colunas da tabela
                 Map<String, List<String>> dadosTabela = tabela.getTabela();
-        
+
                 List<String> tiposLog = dadosTabela.get("Tipo Log");
                 List<String> mensagensLog = dadosTabela.get("Mensagem Log");
-        
+
                 int index = tiposLog.indexOf(tipoLog);
+
                 if (index != -1) {
                     String mensagemFinal = mensagensLog.get(index) + nomeArq;
                     Log.add(mensagemFinal);
                     System.out.println(mensagemFinal);
                 } else {
                     System.out.println("Tipo de log não encontrado.");
+                }
+            }
+
+            // Sobrecarga para tipo de log "END" com 2 parâmetros adicionais
+            public void GerarLog(String tipoLog, String nomeArq, Integer registradorX, Integer registradorY) {
+                if ("END".equals(tipoLog)) {
+                    String mensagem = nomeArq + " terminado. X=" + registradorX + ". Y=" + registradorY;
+                    Log.add(mensagem);
+                    System.out.println(mensagem);
+                } else {
+                    GerarLog(tipoLog, nomeArq); 
+                }
+            }
+
+            // Sobrecarga para tipo de log "INTE" com 1 parâmetro adicional
+            public void GerarLog(String tipoLog, String nomeArq, String instrucoes) {
+                if ("INTE".equals(tipoLog)) {
+                    String mensagem = "Interrompendo " + nomeArq + " após " + instrucoes + " instrucoes";
+                    Log.add(mensagem);
+                    System.out.println(mensagem);
+                } else {
+                    GerarLog(tipoLog, nomeArq); 
                 }
             }
 

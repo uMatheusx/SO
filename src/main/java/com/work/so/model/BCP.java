@@ -67,8 +67,7 @@ public class BCP {
 
         if(instrucao.equals("SAIDA")){
             estado = SO.finalizado;
-            Log.GerarLog("END", nome);
-            System.out.print("X=" + registradorX + ". Y=" + registradorY);
+            Log.GerarLog("END", nome, registradorX, registradorY);
             return estado;
         }
 
