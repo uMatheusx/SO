@@ -47,8 +47,6 @@ public class Escalonador {
         for (BCP processo : processosProntos) {
             processo.carregarProcessos(Log); // Chama o método carregarProcessos de cada processo
         }
-        
-        Log.RelatorioLog();
 
         while(!tabelaProcesos.isEmpty()){
             // nota: fazer um for na lista de bloqueados somando 1 no atributo countBloqueado (se for 2, zerar o atributo e desbloquar o processo)
@@ -77,14 +75,12 @@ public class Escalonador {
                 processoExecutando.setEstado(SO.executando);
                 processoExecutando.setCreditos(processoExecutando.getCreditos() - 1);
                     
-                //loop de execução
-                for(int q = 0; q < quantum; q++){
+                for(int q = 1; q <= quantum; q++){
                     
                     estadoAtual = processoExecutando.executaInstrucao(Log);
         
                     if(estadoAtual == SO.bloqueado){
-                        processosBloqueados.add(processoExecutando);
-                        //precisa ver como contar o tempo na lista de bloqueados
+                        processosBloqueados.addLast(processoExecutando);
                         break;
                     }
         
@@ -92,6 +88,12 @@ public class Escalonador {
                         tabelaProcesos.remove(processoExecutando);
                         break;
                     }
+
+                    if(q == quantum) {
+                        processoExecutando.setExecutando(false);
+                        Log.GerarLog("INTE", processoExecutando.getNome(), processoExecutando.getInstrucoes());
+                    }
+
                 }
         
                 if(estadoAtual == SO.executando){
@@ -99,5 +101,8 @@ public class Escalonador {
                 }        
             }
         }
+
+        Log.RelatorioLog();
+
     }
 }
