@@ -61,6 +61,12 @@ public class Escalonador {
                     //tratamento pra quando todos da lista de processos prontos terem 0 créditos
                 }
                 
+                for (BCP processo : processosBloqueados) {
+                    if (processo.diminuirTempoBloqueado() == -1) {
+                        processosBloqueados.remove(processo);
+                    }
+                }
+
                 /* a partir daqui começa a executar o primeiro da lista */
                 
                 int estadoAtual = -1; 

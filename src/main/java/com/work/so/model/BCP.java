@@ -17,6 +17,7 @@ public class BCP {
     private Integer registradorX;
     private Integer registradorY;
     private ArrayList<String> codigo;
+    private Integer tempoBloqueado;
 
     public BCP(ArrayList<String> arquivo, int prioridade) {
         this.pc = 0;
@@ -28,6 +29,16 @@ public class BCP {
         this.nome = arquivo.get(0);
         arquivo.remove(0); 
         this.codigo = arquivo;
+        this.tempoBloqueado = 0;
+    }
+
+    public Integer diminuirTempoBloqueado() {
+        this.tempoBloqueado++;
+        if (this.tempoBloqueado == 2) {
+            this.tempoBloqueado = 0;
+            return -1;
+        }
+        else return 1;
     }
 
     public Integer executaInstrucao(LoggerModel Log){   
