@@ -30,34 +30,42 @@ public class BCP {
         this.codigo = arquivo;
     }
 
-    public Integer executaInstrucao(){
-        // LoggerModel Logtest = new LoggerModel();       falta colocar logs em cada instrução
+    public Integer executaInstrucao(LoggerModel Log){   
         String instrucao = codigo.get(pc);
         pc++;
 
         if(instrucao.equals("E/S")){
             estado = SO.bloqueado;
+            Log.GerarLog("E/S", nome);
             return estado;
         }
 
         if (instrucao.charAt(0) == 'X') {
             int valor = instrucao.charAt(2) - '0'; 
             registradorX = valor;
+            Log.GerarLog("EXEC", nome);
             return estado;
         }
 
         if(instrucao.charAt(0) == 'Y'){
             int valor = instrucao.charAt(2) - '0'; 
             registradorY = valor;
+            Log.GerarLog("EXEC", nome);
             return estado;
         }
 
         if(instrucao.equals("SAIDA")){
             estado = SO.finalizado;
+            Log.GerarLog("END", nome);
+            System.out.print("X=" + registradorX + ". Y=" + registradorY);
             return estado;
         }
 
         return estado;
+    }
+
+    public void carregarProcessos(LoggerModel Log) {
+        Log.GerarLog("LOAD", nome);
     }
 
     public void imprimirAtributos() {
