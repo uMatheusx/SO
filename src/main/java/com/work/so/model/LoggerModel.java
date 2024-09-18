@@ -70,9 +70,11 @@ import com.work.so.service.Tabela;
                 }
             }
 
-            public void RelatorioLog() {
+            public void RelatorioLog(double mediaTrocas, double mediaInstrucoes) {
                 Integer quantum = leitor.leQuantum("src/main/java/com/work/so/codigos/quantum.txt");
                 String filePath = String.format("src/main/java/com/work/so/logs/log%02d.txt", quantum);
+                String mediaT = String.format("MEDIA TROCAS: %.2f", mediaTrocas);
+                String mediaI = String.format("MEDIA INSTRUCOES: %.2f", mediaInstrucoes); 
 
                 File diretorio = new File("src/main/java/com/work/so/logs");
                 if (!diretorio.exists()) {
@@ -95,6 +97,11 @@ import com.work.so.service.Tabela;
                             writer.newLine();
                         }
                     }
+
+                    writer.newLine();
+                    writer.write(mediaT);
+                    writer.newLine();
+                    writer.write(mediaI);
 
                     writer.write("====================================");
                     writer.newLine();
