@@ -20,7 +20,10 @@ public class Escalonador {
 
         LinkedList<BCP> tabelaProcesos = new LinkedList<>();
 
-        LoggerModel Log = new LoggerModel();  
+        LoggerModel Log = new LoggerModel();
+        
+        float contadorTrocas = 0; //contadores pra calcular as médias
+        float contadorInstrucoes = 0; //contadores pra calcular as médias
 		
         int quantum = leitor.leQuantum("src/main/java/com/work/so/codigos/quantum.txt");
         System.out.println("Quantum:" + quantum); //só pra teste
@@ -98,14 +101,17 @@ public class Escalonador {
                         for(int q = 1; q <= quantum; q++){
                             
                             estadoAtual = processoExecutando.executaInstrucao(Log);
+                            contadorInstrucoes++;
                 
                             if(estadoAtual == SO.bloqueado){
                                 processosBloqueados.addLast(processoExecutando);
+                                contadorTrocas++;
                                 break;
                             }
                 
                             if(estadoAtual == SO.finalizado){
                                 tabelaProcesos.remove(processoExecutando);
+                                contadorTrocas++;
                                 break;
                             }
 
@@ -120,6 +126,7 @@ public class Escalonador {
                             processoExecutando.setEstado(SO.pronto);
                             processosProntos.remove(processoExecutando);
                             processosProntos.addLast(processoExecutando);
+                            contadorTrocas++;
                         } 
                     }
                 }
@@ -144,14 +151,17 @@ public class Escalonador {
                 for(int q = 1; q <= quantum; q++){
                     
                     estadoAtual = processoExecutando.executaInstrucao(Log);
+                    contadorInstrucoes++;
         
                     if(estadoAtual == SO.bloqueado){
                         processosBloqueados.addLast(processoExecutando);
+                        contadorTrocas++;
                         break;
                     }
         
                     if(estadoAtual == SO.finalizado){
                         tabelaProcesos.remove(processoExecutando);
+                        contadorTrocas++;
                         break;
                     }
 
@@ -165,11 +175,16 @@ public class Escalonador {
                 if(estadoAtual == SO.executando){
                     processoExecutando.setEstado(SO.pronto);
                     AdicionarOrdenado.adicionarOrdenado(processosProntos, processoExecutando);
+                    contadorTrocas++;
                 }        
             }
         }
 
+        /* calculando as medias */
+        float mediaTrocas = contadorTrocas/(quantidadeArquivos - 2);
+        float mediaInstrucoes = contadorInstrucoes/contadorTrocas;
+        
         Log.RelatorioLog();
-
+        
     }
 }
