@@ -97,6 +97,10 @@ public class BCP {
         return estado;
     }
 
+    public void restaurarCreditos (){
+        this.creditos = this.prioridade; 
+    }
+
     public void carregarProcessos(LoggerModel Log) {
         Log.GerarLog("LOAD", nome);
     }

@@ -20,7 +20,10 @@ public class Escalonador {
 
         LinkedList<BCP> tabelaProcesos = new LinkedList<>();
 
-        LoggerModel Log = new LoggerModel();  
+        LoggerModel Log = new LoggerModel();
+        
+        float contadorTrocas = 0; //contadores pra calcular as médias
+        float contadorInstrucoes = 0; //contadores pra calcular as médias
 		
         int quantum = leitor.leQuantum("src/main/java/com/work/so/codigos/quantum.txt");
         System.out.println("Quantum:" + quantum); //só pra teste
@@ -49,22 +52,92 @@ public class Escalonador {
         }
 
         while(!tabelaProcesos.isEmpty()){
-            // nota: fazer um for na lista de bloqueados somando 1 no atributo countBloqueado (se for 2, zerar o atributo e desbloquar o processo)
-            
-            if(processosProntos.isEmpty()){
-               //tratamento pra quando a lista de processos prontos estiver vazia
+           
+            /*tratamento pra quando a lista de prontos estiver vazia e ainda ter processos bloqueados */
+            if(processosProntos.isEmpty() && !processosBloqueados.isEmpty()){
+                while(processosProntos.isEmpty()){
+                    for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
+                        BCP processo = iterator.next();
+                        if (processo.diminuirTempoBloqueado() == -1) {
+                            iterator.remove();  // Usa o iterador para remover o processo de forma segura
+                            processo.setEstado(SO.pronto);
+                            AdicionarOrdenado.adicionarOrdenado(processosProntos, processo);
+                        }
+                    }
+                }
             }
 
             else {
-                if(processosProntos.getFirst().getCreditos() == 0){
-                    //tratamento pra quando todos da lista de processos prontos terem 0 créditos
+                
+                /*tratamento pra quando todos da lista de processos terem 0 créditos*/
+                while(processosProntos.getFirst().getCreditos() == 0){
+                    
+                    boolean todosZerados = true;
+                    for (BCP processo : processosBloqueados) {
+                        if(processo.getCreditos() != 0) todosZerados = false;
+                    }
+                    if(todosZerados){
+                        for (BCP processo : tabelaProcesos) {
+                            processo.restaurarCreditos();   //restaura os creditos
+                        }
+                        processosProntos.sort((p1,p2) -> { return -1 * p1.getPrioridade().compareTo(p2.getPrioridade()); });    //e ordena de novo
+                    } else{
+                        /* a partir daqui começa o round robin */
+                        
+                        for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
+                            BCP processo = iterator.next();
+                            if (processo.diminuirTempoBloqueado() == -1) {
+                                iterator.remove();  // Usa o iterador para remover o processo de forma segura
+                                processo.setEstado(SO.pronto);
+                                AdicionarOrdenado.adicionarOrdenado(processosProntos, processo);
+                            }
+                        }
+
+                        
+                        int estadoAtual = SO.pronto; //valor aleatorio so pra declarar a variavel
+                        BCP processoExecutando = processosProntos.removeFirst();
+                        processoExecutando.setEstado(SO.executando);
+                            
+                        for(int q = 1; q <= quantum; q++){
+                            
+                            estadoAtual = processoExecutando.executaInstrucao(Log);
+                            contadorInstrucoes++;
+                
+                            if(estadoAtual == SO.bloqueado){
+                                processosBloqueados.addLast(processoExecutando);
+                                contadorTrocas++;
+                                break;
+                            }
+                
+                            if(estadoAtual == SO.finalizado){
+                                tabelaProcesos.remove(processoExecutando);
+                                contadorTrocas++;
+                                break;
+                            }
+
+                            if(q == quantum) {
+                                processoExecutando.setExecutando(false);
+                                Log.GerarLog("INTE", processoExecutando.getNome(), processoExecutando.getInstrucoes());
+                            }
+
+                        }
+                
+                        if(estadoAtual == SO.executando){
+                            processoExecutando.setEstado(SO.pronto);
+                            processosProntos.remove(processoExecutando);
+                            processosProntos.addLast(processoExecutando);
+                            contadorTrocas++;
+                        } 
+                    }
                 }
                 
+                /*controle do tempo dos bloqueados */
                 for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
                     BCP processo = iterator.next();
                     if (processo.diminuirTempoBloqueado() == -1) {
                         iterator.remove();  // Usa o iterador para remover o processo de forma segura
-                        processosProntos.add(processo);
+                        processo.setEstado(SO.pronto);
+                        AdicionarOrdenado.adicionarOrdenado(processosProntos, processo);
                     }
                 }
 
@@ -78,14 +151,17 @@ public class Escalonador {
                 for(int q = 1; q <= quantum; q++){
                     
                     estadoAtual = processoExecutando.executaInstrucao(Log);
+                    contadorInstrucoes++;
         
                     if(estadoAtual == SO.bloqueado){
                         processosBloqueados.addLast(processoExecutando);
+                        contadorTrocas++;
                         break;
                     }
         
                     if(estadoAtual == SO.finalizado){
                         tabelaProcesos.remove(processoExecutando);
+                        contadorTrocas++;
                         break;
                     }
 
@@ -97,12 +173,18 @@ public class Escalonador {
                 }
         
                 if(estadoAtual == SO.executando){
+                    processoExecutando.setEstado(SO.pronto);
                     AdicionarOrdenado.adicionarOrdenado(processosProntos, processoExecutando);
+                    contadorTrocas++;
                 }        
             }
         }
 
+        /* calculando as medias */
+        float mediaTrocas = contadorTrocas/(quantidadeArquivos - 2);
+        float mediaInstrucoes = contadorInstrucoes/contadorTrocas;
+        
         Log.RelatorioLog();
-
+        
     }
 }
