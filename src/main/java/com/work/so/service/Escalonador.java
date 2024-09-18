@@ -183,8 +183,12 @@ public class Escalonador {
         /* calculando as medias */
         float mediaTrocas = contadorTrocas/(quantidadeArquivos - 2);
         float mediaInstrucoes = contadorInstrucoes/contadorTrocas;
+        String mediaT = String.format("MEDIA TROCAS: %.2f", mediaTrocas);
+        String mediaI = String.format("MEDIA INSTRUCOES: %.2f", mediaInstrucoes); 
+        System.out.println(mediaT);
+        System.out.println(mediaI);
         
-        Log.RelatorioLog();
+        Log.RelatorioLog(mediaTrocas, mediaInstrucoes);
         
     }
 }

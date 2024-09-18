@@ -56,6 +56,8 @@ public class BCP {
         String instrucao = codigo.get(pc);
         pc++;
 
+        instrucoes++;
+
         if(instrucao.equals("SAIDA")){
             estado = SO.finalizado;
             executando = false;
@@ -63,9 +65,6 @@ public class BCP {
             instrucoes = 0; 
             return estado;
         }
-
-
-        instrucoes++;
 
         if(instrucao.equals("E/S")){
             estado = SO.bloqueado;
