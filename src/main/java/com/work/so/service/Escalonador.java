@@ -60,8 +60,8 @@ public class Escalonador {
                         BCP processo = iterator.next();
                         if (processo.diminuirTempoBloqueado() == -1) {
                             iterator.remove();  // Usa o iterador para remover o processo de forma segura
-                            processo.setEstado(SO.pronto);
                             AdicionarOrdenado.adicionarOrdenado(processosProntos, processo);
+                            processo.setEstado(SO.pronto);
                         }
                     }
                 }
@@ -88,8 +88,8 @@ public class Escalonador {
                             BCP processo = iterator.next();
                             if (processo.diminuirTempoBloqueado() == -1) {
                                 iterator.remove();  // Usa o iterador para remover o processo de forma segura
-                                processo.setEstado(SO.pronto);
                                 AdicionarOrdenado.adicionarOrdenado(processosProntos, processo);
+                                processo.setEstado(SO.pronto);
                             }
                         }
 
@@ -131,15 +131,7 @@ public class Escalonador {
                     }
                 }
                 
-                /*controle do tempo dos bloqueados */
-                for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
-                    BCP processo = iterator.next();
-                    if (processo.diminuirTempoBloqueado() == -1) {
-                        iterator.remove();  // Usa o iterador para remover o processo de forma segura
-                        processo.setEstado(SO.pronto);
-                        AdicionarOrdenado.adicionarOrdenado(processosProntos, processo);
-                    }
-                }
+                
 
                 /* a partir daqui começa a executar o primeiro da lista */
                 
@@ -173,10 +165,20 @@ public class Escalonador {
                 }
         
                 if(estadoAtual == SO.executando){
-                    processoExecutando.setEstado(SO.pronto);
                     AdicionarOrdenado.adicionarOrdenado(processosProntos, processoExecutando);
+                    processoExecutando.setEstado(SO.pronto);
                     contadorTrocas++;
-                }        
+                } 
+                
+                /*controle do tempo dos bloqueados */
+                for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
+                    BCP processo = iterator.next();
+                    if (processo.diminuirTempoBloqueado() == -1) {
+                        iterator.remove();  // Usa o iterador para remover o processo de forma segura
+                        AdicionarOrdenado.adicionarOrdenado(processosProntos, processo);
+                        processo.setEstado(SO.pronto);
+                    }
+                }
             }
         }
 

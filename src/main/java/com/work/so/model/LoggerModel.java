@@ -1,4 +1,4 @@
-        package com.work.so.model;
+package com.work.so.model;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -102,7 +102,10 @@ import com.work.so.service.Tabela;
                     writer.write(mediaT);
                     writer.newLine();
                     writer.write(mediaI);
+                    writer.newLine();
+                    writer.write("Quantum: " + quantum);
 
+                    writer.newLine();
                     writer.write("====================================");
                     writer.newLine();
                     
