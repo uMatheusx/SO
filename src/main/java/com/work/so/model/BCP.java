@@ -37,12 +37,15 @@ public class BCP {
     }
 
     public Integer diminuirTempoBloqueado() {
-        this.tempoBloqueado++;
+        
         if (this.tempoBloqueado == 2) {
             this.tempoBloqueado = 0;
             return -1;
         }
-        else return 1;
+        else{
+            this.tempoBloqueado++;
+            return 1;
+        }
     }
 
     public Integer executaInstrucao(LoggerModel Log){   
@@ -75,13 +78,13 @@ public class BCP {
         }
 
         if (instrucao.charAt(0) == 'X') {
-            int valor = instrucao.charAt(2) - '0'; 
+            int valor = Integer.valueOf(instrucao.substring(2)); 
             registradorX = valor;
             return estado;
         }
 
         if(instrucao.charAt(0) == 'Y'){
-            int valor = instrucao.charAt(2) - '0'; 
+            int valor = Integer.valueOf(instrucao.substring(2)); 
             registradorY = valor;
             return estado;
         }
