@@ -40,7 +40,6 @@ public class Escalonador {
 			String index = String.format("src/main/java/com/work/so/codigos/%02d.txt", i);
 			arquivo = leitor.lePrograma(index);
 			BCP processo = new BCP(arquivo, prioridades.get(i-1));
-        	// processo.imprimirAtributos();
 			processosProntos.add(processo);
             tabelaProcesos.add(processo);
 		}
@@ -65,12 +64,9 @@ public class Escalonador {
                         }
                     }
                 }
-            }
-
-            else {
+            } else {
                 
-                /*tratamento pra quando todos da lista de processos terem 0 créditos*/
-                while(processosProntos.getFirst().getCreditos() == 0){
+                while(!processosProntos.isEmpty() && processosProntos.getFirst().getCreditos() == 0){
                     
                     boolean todosZerados = true;
                     for (BCP processo : processosBloqueados) {
@@ -78,10 +74,10 @@ public class Escalonador {
                     }
                     if(todosZerados){
                         for (BCP processo : tabelaProcesos) {
-                            processo.restaurarCreditos();   //restaura os creditos
+                            processo.restaurarCreditos();   //restaura os créditos
                         }
                         processosProntos.sort((p1,p2) -> { return -1 * p1.getPrioridade().compareTo(p2.getPrioridade()); });    //e ordena de novo
-                    } else{
+                    } else {
                         /* a partir daqui começa o round robin */
                         
                         for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
@@ -93,82 +89,80 @@ public class Escalonador {
                             }
                         }
 
-                        
-                        int estadoAtual = SO.pronto; //valor aleatorio so pra declarar a variavel
-                        BCP processoExecutando = processosProntos.removeFirst();
-                        processoExecutando.setEstado(SO.executando);
-                            
-                        for(int q = 1; q <= quantum; q++){
-                            
-                            estadoAtual = processoExecutando.executaInstrucao(Log);
-                            contadorInstrucoes++;
-                
-                            if(estadoAtual == SO.bloqueado){
-                                processosBloqueados.addLast(processoExecutando);
-                                contadorTrocas++;
-                                break;
-                            }
-                
-                            if(estadoAtual == SO.finalizado){
-                                tabelaProcesos.remove(processoExecutando);
-                                contadorTrocas++;
-                                break;
-                            }
+                        if (!processosProntos.isEmpty()) {
+                            int estadoAtual = SO.pronto; //valor aleatório só pra declarar a variável
+                            BCP processoExecutando = processosProntos.removeFirst();
+                            processoExecutando.setEstado(SO.executando);
+                                
+                            for(int q = 1; q <= quantum; q++){
+                                
+                                estadoAtual = processoExecutando.executaInstrucao(Log);
+                                contadorInstrucoes++;
+                    
+                                if(estadoAtual == SO.bloqueado){
+                                    processosBloqueados.addLast(processoExecutando);
+                                    contadorTrocas++;
+                                    break;
+                                }
+                    
+                                if(estadoAtual == SO.finalizado){
+                                    tabelaProcesos.remove(processoExecutando);
+                                    contadorTrocas++;
+                                    break;
+                                }
 
-                            if(q == quantum) {
-                                processoExecutando.setExecutando(false);
-                                Log.GerarLog("INTE", processoExecutando.getNome(), processoExecutando.getInstrucoes());
-                            }
+                                if(q == quantum) {
+                                    processoExecutando.setExecutando(false);
+                                    Log.GerarLog("INTE", processoExecutando.getNome(), processoExecutando.getInstrucoes());
+                                }
 
+                            }
+                    
+                            if(estadoAtual == SO.executando){
+                                processoExecutando.setEstado(SO.pronto);
+                                processosProntos.addLast(processoExecutando);
+                                contadorTrocas++;
+                            } 
                         }
-                
-                        if(estadoAtual == SO.executando){
-                            processoExecutando.setEstado(SO.pronto);
-                            processosProntos.remove(processoExecutando);
-                            processosProntos.addLast(processoExecutando);
+                    }
+                }
+
+                if (!processosProntos.isEmpty()) {
+                    int estadoAtual = -1; 
+                    BCP processoExecutando = processosProntos.removeFirst();
+                    processoExecutando.setEstado(SO.executando);
+                    processoExecutando.setCreditos(processoExecutando.getCreditos() - 1);
+                        
+                    for(int q = 1; q <= quantum; q++){
+                        
+                        estadoAtual = processoExecutando.executaInstrucao(Log);
+                        contadorInstrucoes++;
+            
+                        if(estadoAtual == SO.bloqueado){
+                            processosBloqueados.addLast(processoExecutando);
                             contadorTrocas++;
-                        } 
+                            break;
+                        }
+            
+                        if(estadoAtual == SO.finalizado){
+                            tabelaProcesos.remove(processoExecutando);
+                            contadorTrocas++;
+                            break;
+                        }
+
+                        if(q == quantum) {
+                            processoExecutando.setExecutando(false);
+                            Log.GerarLog("INTE", processoExecutando.getNome(), processoExecutando.getInstrucoes());
+                        }
+
+                    }
+            
+                    if(estadoAtual == SO.executando){
+                        AdicionarOrdenado.adicionarOrdenado(processosProntos, processoExecutando);
+                        processoExecutando.setEstado(SO.pronto);
+                        contadorTrocas++;
                     }
                 }
-                
-                
-
-                /* a partir daqui começa a executar o primeiro da lista */
-                
-                int estadoAtual = -1; 
-                BCP processoExecutando = processosProntos.removeFirst();
-                processoExecutando.setEstado(SO.executando);
-                processoExecutando.setCreditos(processoExecutando.getCreditos() - 1);
-                    
-                for(int q = 1; q <= quantum; q++){
-                    
-                    estadoAtual = processoExecutando.executaInstrucao(Log);
-                    contadorInstrucoes++;
-        
-                    if(estadoAtual == SO.bloqueado){
-                        processosBloqueados.addLast(processoExecutando);
-                        contadorTrocas++;
-                        break;
-                    }
-        
-                    if(estadoAtual == SO.finalizado){
-                        tabelaProcesos.remove(processoExecutando);
-                        contadorTrocas++;
-                        break;
-                    }
-
-                    if(q == quantum) {
-                        processoExecutando.setExecutando(false);
-                        Log.GerarLog("INTE", processoExecutando.getNome(), processoExecutando.getInstrucoes());
-                    }
-
-                }
-        
-                if(estadoAtual == SO.executando){
-                    AdicionarOrdenado.adicionarOrdenado(processosProntos, processoExecutando);
-                    processoExecutando.setEstado(SO.pronto);
-                    contadorTrocas++;
-                } 
                 
                 /*controle do tempo dos bloqueados */
                 for (Iterator<BCP> iterator = processosBloqueados.iterator(); iterator.hasNext();) {
@@ -182,15 +176,14 @@ public class Escalonador {
             }
         }
 
-        /* calculando as medias */
-        float mediaTrocas = contadorTrocas/(quantidadeArquivos - 2);
-        float mediaInstrucoes = contadorInstrucoes/contadorTrocas;
+        /* calculando as médias */
+        float mediaTrocas = contadorTrocas / (quantidadeArquivos - 2);
+        float mediaInstrucoes = contadorInstrucoes / contadorTrocas;
         String mediaT = String.format("MEDIA TROCAS: %.2f", mediaTrocas);
         String mediaI = String.format("MEDIA INSTRUCOES: %.2f", mediaInstrucoes); 
         System.out.println(mediaT);
         System.out.println(mediaI);
         
         Log.RelatorioLog(mediaTrocas, mediaInstrucoes);
-        
     }
 }
